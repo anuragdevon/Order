@@ -9,11 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type Handler struct {
+type Database struct {
 	DB *gorm.DB
 }
 
-func Init(url string) Handler {
+func Init(url string) Database {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 
 	if err != nil {
@@ -22,10 +22,10 @@ func Init(url string) Handler {
 
 	db.AutoMigrate(&models.Order{})
 
-	return Handler{db}
+	return Database{db}
 }
 
-func (h *Handler) Close() {
+func (h *Database) Close() {
 	sqlDB, err := h.DB.DB()
 	if err != nil {
 		log.Println("Failed to get underlying *sql.DB:", err)

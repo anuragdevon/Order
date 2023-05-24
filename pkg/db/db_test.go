@@ -9,9 +9,9 @@ import (
 func TestInit(t *testing.T) {
 	dbURL := "postgres://postgres:postgres@localhost:5432/testdb2?sslmode=disable"
 
-	handler := Init(dbURL)
+	database := Init(dbURL)
 
-	if handler.DB == nil {
+	if database.DB == nil {
 		t.Error("Failed to initialize database connection")
 	}
 
@@ -20,13 +20,13 @@ func TestInit(t *testing.T) {
 		ItemId: 1,
 		UserId: 1,
 	}
-	result := handler.DB.Create(&order)
+	result := database.DB.Create(&order)
 	if result.Error != nil {
 		t.Errorf("Failed to create order: %v", result.Error)
 	}
 
 	var retrievedOrder models.Order
-	result = handler.DB.First(&retrievedOrder, order.Id)
+	result = database.DB.First(&retrievedOrder, order.Id)
 	if result.Error != nil {
 		t.Errorf("Failed to retrieve order: %v", result.Error)
 	}
@@ -34,5 +34,5 @@ func TestInit(t *testing.T) {
 	if retrievedOrder.Price != order.Price || retrievedOrder.ItemId != order.ItemId || retrievedOrder.UserId != order.UserId {
 		t.Error("Retrieved order does not match the created order")
 	}
-	handler.Close()
+	database.Close()
 }

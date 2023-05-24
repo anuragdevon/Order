@@ -38,9 +38,7 @@ func TestInventoryServiceClient(t *testing.T) {
 
 		itemID := int64(123)
 		quantity := int64(20)
-		price := int64(200)
-		name := "New Item Name"
-		response, err := client.UpdateItem(itemID, quantity, price, name)
+		response, err := client.UpdateItem(itemID, quantity)
 
 		if err != nil {
 			t.Errorf("Failed to update item: %v", err)
@@ -50,7 +48,7 @@ func TestInventoryServiceClient(t *testing.T) {
 			t.Errorf("Unexpected status code: %d", response.Status)
 		}
 
-		if response.Data == nil || response.Data.Id != itemID || response.Data.Name != name || response.Data.Quantity != quantity || response.Data.Price != price {
+		if response.Data == nil || response.Data.Id != itemID || response.Data.Quantity != quantity {
 			t.Error("Invalid updated item data")
 		}
 	})

@@ -3,7 +3,7 @@ package db
 import (
 	"testing"
 
-	"order/pkg/models"
+	"order/pkg/repository/models"
 )
 
 func TestInit(t *testing.T) {
@@ -16,7 +16,6 @@ func TestInit(t *testing.T) {
 	}
 
 	order := models.Order{
-		Price:  100,
 		ItemId: 1,
 		UserId: 1,
 	}
@@ -31,7 +30,7 @@ func TestInit(t *testing.T) {
 		t.Errorf("Failed to retrieve order: %v", result.Error)
 	}
 
-	if retrievedOrder.Price != order.Price || retrievedOrder.ItemId != order.ItemId || retrievedOrder.UserId != order.UserId {
+	if retrievedOrder.ItemId != order.ItemId || retrievedOrder.UserId != order.UserId {
 		t.Error("Retrieved order does not match the created order")
 	}
 	database.Close()

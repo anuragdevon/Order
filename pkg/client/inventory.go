@@ -17,12 +17,10 @@ func (c *InventoryServiceClient) GetItem(productId int64) (*pb.GetItemResponse, 
 	return c.Client.GetItem(context.Background(), req)
 }
 
-func (c *InventoryServiceClient) UpdateItem(id, quantity, price int64, name string) (*pb.UpdateItemResponse, error) {
+func (c *InventoryServiceClient) UpdateItem(id, quantity int64) (*pb.UpdateItemResponse, error) {
 	req := &pb.UpdateItemRequest{
 		Id:       id,
 		Quantity: quantity,
-		Price:    price,
-		Name:     name,
 	}
 
 	return c.Client.UpdateItem(context.Background(), req)

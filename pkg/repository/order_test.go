@@ -1,10 +1,8 @@
-package repository_test
+package repository
 
 import (
 	"testing"
 
-	"order/pkg/db"
-	"order/pkg/repository"
 	"order/pkg/repository/models"
 
 	"gorm.io/driver/postgres"
@@ -15,14 +13,14 @@ func TestRepository(t *testing.T) {
 	t.Run("CreateOrder method to successfully create database entry for new order", func(t *testing.T) {
 		testDB := setupTestDB()
 
-		handler := db.Database{DB: testDB}
+		handler := Database{DB: testDB}
 
 		order := &models.Order{
 			ItemId: 123,
 			UserId: 456,
 		}
 
-		err := repository.CreateOrder(&handler, order)
+		err := handler.CreateOrder(order)
 		if err != nil {
 			t.Errorf("Failed to create order: %v", err)
 		}
@@ -31,10 +29,10 @@ func TestRepository(t *testing.T) {
 	t.Run("DeleteOrder to successfully delete an order for failure occured from InventorySvc", func(t *testing.T) {
 		testDB := setupTestDB()
 
-		handler := db.Database{DB: testDB}
+		handler := Database{DB: testDB}
 
 		orderID := int64(789)
-		err := repository.DeleteOrder(&handler, orderID)
+		err := handler.DeleteOrder(orderID)
 		if err != nil {
 			t.Errorf("Failed to delete order: %v", err)
 		}

@@ -12,7 +12,7 @@ import (
 )
 
 func TestRepository(t *testing.T) {
-	t.Run("CreateOrder", func(t *testing.T) {
+	t.Run("CreateOrder method to successfully create database entry for new order", func(t *testing.T) {
 		testDB := setupTestDB()
 
 		handler := db.Database{DB: testDB}
@@ -28,7 +28,7 @@ func TestRepository(t *testing.T) {
 		}
 	})
 
-	t.Run("DeleteOrder", func(t *testing.T) {
+	t.Run("DeleteOrder to successfully delete an order for failure occured from InventorySvc", func(t *testing.T) {
 		testDB := setupTestDB()
 
 		handler := db.Database{DB: testDB}

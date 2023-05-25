@@ -8,7 +8,7 @@ import (
 )
 
 func TestPostgreSQL(t *testing.T) {
-	t.Run("Connect to database successfully with valid dbname", func(t *testing.T) {
+	t.Run("Connect method should connect to database successfully with valid dbname", func(t *testing.T) {
 		db := &Database{}
 		err := db.Connect("testdb2")
 		if err != nil {
@@ -21,7 +21,7 @@ func TestPostgreSQL(t *testing.T) {
 		}
 	})
 
-	t.Run("Close connection to db successfully", func(t *testing.T) {
+	t.Run("Close method should close connection to db successfully", func(t *testing.T) {
 		db := &Database{}
 		err := db.Connect("testdb")
 		if err != nil {
@@ -34,7 +34,7 @@ func TestPostgreSQL(t *testing.T) {
 		}
 	})
 
-	t.Run("Connect to database to return error with invalid dbName", func(t *testing.T) {
+	t.Run("Connect method should return error for connecting with database with invalid dbName", func(t *testing.T) {
 		db := &Database{}
 		err := db.Connect("invalid_db")
 		if err == nil {
@@ -42,7 +42,7 @@ func TestPostgreSQL(t *testing.T) {
 		}
 	})
 
-	t.Run("Connect to database successfully creates migration tables", func(t *testing.T) {
+	t.Run("Connect method should create migration tables after successful db connection", func(t *testing.T) {
 		db := &Database{}
 		err := db.Connect("testdb2")
 		assert.NoError(t, err, "Failed to connect to the database")

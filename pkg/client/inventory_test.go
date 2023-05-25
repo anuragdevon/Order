@@ -1,17 +1,30 @@
 package client
 
 import (
+	"net/http"
+	"order/pkg/pb"
 	"order/pkg/pb/mocks"
 	"testing"
+
+	"github.com/stretchr/testify/mock"
 )
 
 func TestInventoryServiceClient(t *testing.T) {
-	t.Run("GetItem method to return status 200 OK for successful grpc call to inventory service for getItem details", func(t *testing.T) {
-		mockClient := &mocks.InventoryServiceClient{}
+	mockClient := &mocks.InventoryServiceClient{}
 
-		client := &InventoryServiceClient{
-			Client: mockClient,
-		}
+	client := &InventoryServiceClient{
+		Client: mockClient,
+	}
+
+	t.Run("GetItem method to return status 200 OK for successful grpc call to inventory service for getItem details", func(t *testing.T) {
+		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
+			Status: http.StatusOK,
+			Error:  "",
+			Data: &pb.GetItemData{
+				Id:       123,
+				Quantity: 10,
+			},
+		}, nil)
 
 		itemID := int64(123)
 		response, err := client.GetItem(itemID)
@@ -29,15 +42,14 @@ func TestInventoryServiceClient(t *testing.T) {
 		}
 	})
 
-	t.Run("UpdateItem method to return status 200 OK for successful grpc call to inventory service for update item quanity", func(t *testing.T) {
-		mockClient := &mocks.InventoryServiceClient{}
-
-		client := &InventoryServiceClient{
-			Client: mockClient,
-		}
+	t.Run("DecreaseItemQuantity method to return status 200 OK for successful grpc call to inventory service for update item quanity", func(t *testing.T) {
+		mockClient.On("DecreaseItemQuantity", mock.Anything, mock.Anything).Return(&pb.DecreaseItemQuantityResponse{
+			Status: http.StatusOK,
+			Error:  "",
+		}, nil)
 
 		itemID := int64(123)
-		quantity := int64(20)
+		quantity := int64(5)
 		response, err := client.DecreaseItemQuantity(itemID, quantity)
 
 		if err != nil {

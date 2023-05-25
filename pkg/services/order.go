@@ -31,7 +31,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 
 	if err != nil {
 		return &pb.CreateOrderResponse{
-				Status: http.StatusBadRequest,
+				Status: http.StatusBadGateway,
 				Error:  err.Error(),
 			},
 			nil

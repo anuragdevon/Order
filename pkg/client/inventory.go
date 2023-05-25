@@ -6,10 +6,11 @@ import (
 	"order/pkg/pb"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func InitInventoryServiceClient(url string) InventoryServiceClient {
-	cc, err := grpc.Dial(url, grpc.WithInsecure())
+	cc, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	if err != nil {
 		fmt.Println("Could not connect:", err)
@@ -26,19 +27,19 @@ type InventoryServiceClient struct {
 	Client pb.InventoryServiceClient
 }
 
-func (c *InventoryServiceClient) GetItem(productId int64) (*pb.GetItemResponse, error) {
+func (c *InventoryServiceClient) GetItem(itemId int64) (*pb.GetItemResponse, error) {
 	req := &pb.GetItemRequest{
-		Id: productId,
+		Id: itemId,
 	}
 
 	return c.Client.GetItem(context.Background(), req)
 }
 
-func (c *InventoryServiceClient) UpdateItem(id, quantity int64) (*pb.UpdateItemResponse, error) {
-	req := &pb.UpdateItemRequest{
+func (c *InventoryServiceClient) DecreaseItemQuantity(id, quantity int64) (*pb.DecreaseItemQuantityResponse, error) {
+	req := &pb.DecreaseItemQuantityRequest{
 		Id:       id,
 		Quantity: quantity,
 	}
 
-	return c.Client.UpdateItem(context.Background(), req)
+	return c.Client.DecreaseItemQuantity(context.Background(), req)
 }

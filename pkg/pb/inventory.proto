@@ -5,24 +5,10 @@ package inventory;
 option go_package = "./pkg/pb";
 
 service InventoryService {
-  rpc CreateItem(CreateItemRequest) returns (CreateItemResponse) {}
   rpc GetItem(GetItemRequest) returns (GetItemResponse) {}
-  rpc GetAllItems(GetAllItemsRequest) returns (GetAllItemsResponse) {}
-  rpc UpdateItem(UpdateItemRequest) returns (UpdateItemResponse) {}
-  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse) {}
+  rpc DecreaseItemQuantity(DecreaseItemQuantityRequest) returns (DecreaseItemQuantityResponse) {}
 }
 
-message CreateItemRequest {
-  string name = 1;
-  int64 quantity = 2;
-  int64 price = 3;
-}
-
-message CreateItemResponse {
-  int64 status = 1;
-  string error = 2;
-  int64 id = 3;
-}
 
 message GetItemRequest { 
   int64 id = 1; 
@@ -41,32 +27,12 @@ message GetItemResponse {
   GetItemData data = 3;
 }
 
-message GetAllItemsRequest {}
-
-message GetAllItemsResponse {
-  int64 status = 1;
-  string error = 2;
-  repeated GetItemData data = 3;
-}
-
-message UpdateItemRequest {
+message DecreaseItemQuantityRequest {
   int64 id = 1;
-  string name = 2;
-  int64 quantity = 3;
-  int64 price = 4;
+  int64 quantity = 2;
 }
 
-message UpdateItemResponse {
-  int64 status = 1;
-  string error = 2;
-  GetItemData data = 3;
-}
-
-message DeleteItemRequest {
-  int64 id = 1;
-}
-
-message DeleteItemResponse {
+message DecreaseItemQuantityResponse {
   int64 status = 1;
   string error = 2;
 }

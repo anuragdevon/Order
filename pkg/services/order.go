@@ -66,7 +66,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 
 	if err != nil {
 		db.DeleteOrder(order.Id)
-		return &pb.CreateOrderResponse{Status: http.StatusBadRequest, Error: err.Error()}, nil
+		return &pb.CreateOrderResponse{Status: http.StatusInternalServerError, Error: "Internal server error"}, nil
 
 	}
 	return &pb.CreateOrderResponse{

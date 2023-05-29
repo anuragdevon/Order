@@ -10,7 +10,7 @@ import (
 func TestPostgreSQL(t *testing.T) {
 	t.Run("Connect method should connect to database successfully with valid dbname", func(t *testing.T) {
 		db := &Database{}
-		err := db.Connect("testdb2")
+		err := db.Connect("testdb")
 		if err != nil {
 			t.Errorf("error connecting to database: %s", err)
 		}
@@ -44,7 +44,7 @@ func TestPostgreSQL(t *testing.T) {
 
 	t.Run("Connect method should create migration tables after successful db connection", func(t *testing.T) {
 		db := &Database{}
-		err := db.Connect("testdb2")
+		err := db.Connect("testdb")
 		assert.NoError(t, err, "Failed to connect to the database")
 
 		assert.True(t, db.DB.Migrator().HasTable(&models.Order{}), "Migration table for Order does not exist")

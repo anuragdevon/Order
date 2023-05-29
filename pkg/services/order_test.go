@@ -24,7 +24,7 @@ func TestCreateOrder(t *testing.T) {
 		db:           db.DB,
 	}
 
-	t.Run("CreateOrder method to return 200 StatusOK for successful valid order creation", func(t *testing.T) {
+	t.Run("CreateOrder method to return 201 StatusCreated for successful valid order creation", func(t *testing.T) {
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
 			Status: http.StatusOK,
 			Error:  "",
@@ -33,6 +33,8 @@ func TestCreateOrder(t *testing.T) {
 				Quantity: 10,
 			},
 		}, nil)
+
+		mockClient.On("DecreaseItemQuantity", mock.Anything, mock.Anything).Return(nil, nil)
 
 		request := &pb.CreateOrderRequest{
 			ItemId:   123,
@@ -48,9 +50,8 @@ func TestCreateOrder(t *testing.T) {
 		assert.Equal(t, int64(1), response.Id, "Unexpected order ID")
 	})
 
-	t.Run("CreateOrder method to return status 502 BadGateway when InventoryService GetItem returns an error", func(t *testing.T) {
-		expectedError := "Inventory service unavailable"
-		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(nil, errors.New(expectedError))
+	t.Run("CreateOrder method to return 502 StatusBadGateway when GetItem returns an error", func(t *testing.T) {
+		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(nil, errors.New("GetItem error"))
 
 		request := &pb.CreateOrderRequest{
 			ItemId:   123,
@@ -60,8 +61,10 @@ func TestCreateOrder(t *testing.T) {
 
 		response, err := orderService.CreateOrder(context.Background(), request)
 
-		assert.Nil(t, err)
-		assert.Equal(t, int64(http.StatusBadGateway), response.Status, "Unexpected error status")
+		assert.NoError(t, err, "Unexpected error")
+		assert.NotNil(t, response, "Response is nil")
+		assert.Equal(t, int64(http.StatusBadGateway), response.Status, "Unexpected response status")
+		assert.Contains(t, response.Error, "GetItem error", "Error message mismatch")
 	})
 
 	t.Run("CreateOrder method to return status 404 NotFound when the requested item is not found in the inventory", func(t *testing.T) {
@@ -85,7 +88,31 @@ func TestCreateOrder(t *testing.T) {
 		assert.Contains(t, response.Error, "Item not found", "Unexpected error message")
 	})
 
-	t.Run("CreateOrder method to return http.StatusConflict when the order quantity is more than the available quantity in the inventory", func(t *testing.T) {
+	t.Run("CreateOrder method to return 409 StatusConflict when quantity is insufficient", func(t *testing.T) {
+		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
+			Status: http.StatusOK,
+			Error:  "",
+			Data: &pb.GetItemData{
+				Id:       123,
+				Quantity: 3,
+			},
+		}, nil)
+
+		request := &pb.CreateOrderRequest{
+			ItemId:   123,
+			UserId:   456,
+			Quantity: 5,
+		}
+
+		response, err := orderService.CreateOrder(context.Background(), request)
+
+		assert.NoError(t, err, "Unexpected error")
+		assert.NotNil(t, response, "Response is nil")
+		assert.Equal(t, int64(http.StatusConflict), response.Status, "Unexpected response status")
+		assert.Contains(t, response.Error, "Quantity is insufficient", "Error message mismatch")
+	})
+
+	t.Run("CreateOrder method to return 500 InternalServerError when DecreaseItemQuantity Service call fails", func(t *testing.T) {
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
 			Status: http.StatusOK,
 			Error:  "",
@@ -95,17 +122,21 @@ func TestCreateOrder(t *testing.T) {
 			},
 		}, nil)
 
+		mockClient.On("DecreaseItemQuantity", mock.Anything, mock.Anything).Return(nil, errors.New("DecreaseItemQuantity error"))
+
 		request := &pb.CreateOrderRequest{
 			ItemId:   123,
 			UserId:   456,
-			Quantity: 15,
+			Quantity: 5,
 		}
 
 		response, err := orderService.CreateOrder(context.Background(), request)
 
-		assert.NoError(t, err, "Unexpected error")
+		assert.NoError(t, err)
 		assert.NotNil(t, response, "Response is nil")
-		assert.Equal(t, int64(http.StatusConflict), response.Status, "Unexpected response status")
-		assert.Contains(t, response.Error, "Quantity is insufficient", "Unexpected error message")
+		assert.Equal(t, int64(http.StatusInternalServerError), response.Status, "Unexpected response status")
+		assert.Contains(t, response.Error, "DecreaseItemQuantity error", "Error message mismatch")
+
 	})
+
 }

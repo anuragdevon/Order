@@ -50,8 +50,9 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 	}
 
 	order := models.Order{
-		ItemId: itemResp.Data.Id,
-		UserId: req.UserId,
+		ItemId:   itemResp.Data.Id,
+		UserId:   req.UserId,
+		Quantity: req.Quantity,
 	}
 	db := repository.Database{DB: os.db}
 
@@ -59,6 +60,14 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 
 	if err != nil {
 		return &pb.CreateOrderResponse{Status: http.StatusBadRequest, Error: err.Error()}, nil
+	}
+
+	_, err = os.InventorySvc.DecreaseItemQuantity(order.ItemId, order.Quantity)
+
+	if err != nil {
+		db.DeleteOrder(order.Id)
+		return &pb.CreateOrderResponse{Status: http.StatusBadRequest, Error: err.Error()}, nil
+
 	}
 	return &pb.CreateOrderResponse{
 		Status: http.StatusCreated,

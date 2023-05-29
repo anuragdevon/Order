@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	InventoryService_GetItem_FullMethodName              = "/inventory.InventoryService/GetItem"
-	InventoryService_DecreaseItemQuantity_FullMethodName = "/inventory.InventoryService/DecreaseItemQuantity"
+	InventoryService_GetItem_FullMethodName              = "/com.example.Inventory.Inventory/GetItem"
+	InventoryService_DecreaseItemQuantity_FullMethodName = "/com.example.Inventory.Inventory/DecreaseItemQuantity"
 )
 
 // InventoryServiceClient is the client API for InventoryService service.

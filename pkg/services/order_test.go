@@ -176,7 +176,7 @@ func TestCreateOrder(t *testing.T) {
 
 	})
 
-	t.Run("GetOrder method to return order data for a valid order ID", func(t *testing.T) {
+	t.Run("GetOrder method to return status 200 OK and order data for a valid order ID", func(t *testing.T) {
 		ItemId := int64(123)
 		mockClient := &mocks.InventoryServiceClient{}
 		client := &client.InventoryServiceClient{
@@ -219,6 +219,46 @@ func TestCreateOrder(t *testing.T) {
 		assert.Equal(t, expectedGetItemData.Name, response.Data.Name, "Unexpected item name")
 		assert.Equal(t, newOrder.Quantity, response.Data.Quantity, "Unexpected order quantity")
 		assert.Equal(t, expectedGetItemData.Price, response.Data.Price, "Unexpected item price")
+	})
+
+	t.Run("GetOrder method to return 404 NotFound when requested user does not match with order userId", func(t *testing.T) {
+		ItemId := int64(123)
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+		newOrder := models.Order{
+			ItemId:   ItemId,
+			UserId:   12,
+			Quantity: 2,
+		}
+		db.CreateOrder(&newOrder)
+
+		expectedGetItemData := &pb.GetItemData{
+			Id:    123,
+			Name:  "Item-1",
+			Price: 30,
+		}
+		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
+			Status: http.StatusOK,
+			Error:  "",
+			Data:   expectedGetItemData,
+		}, nil)
+
+		request := &pb.GetOrderRequest{
+			Id: newOrder.Id,
+		}
+
+		response, err := orderService.GetOrder(context.Background(), request)
+
+		assert.NoError(t, err, "Unexpected error")
+		assert.NotNil(t, response, "Response is nil")
+		assert.Equal(t, int64(http.StatusNotFound), response.Status, "Unexpected response status")
+		assert.Contains(t, response.Error, "Order not found", "Error message mismatch")
 	})
 
 	t.Run("GetOrder method to return 404 NotFound for a non-existent order ID", func(t *testing.T) {

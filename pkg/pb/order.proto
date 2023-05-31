@@ -9,7 +9,6 @@ service OrderService {
   rpc GetOrder(GetOrderRequest) returns (GetOrderResponse) {}
 }
 
-// TODO: Implement repeated items for cart order feature
 message CreateOrderRequest {
   int64 itemId = 1;
   int64 quantity = 2;

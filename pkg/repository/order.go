@@ -11,3 +11,12 @@ func (db *Database) CreateOrder(order *models.Order) error {
 func (db *Database) DeleteOrder(orderId int64) error {
 	return db.DB.Delete(&models.Order{}, orderId).Error
 }
+
+func (db *Database) GetOrder(orderId int64) (*models.Order, error) {
+	order := &models.Order{}
+	result := db.DB.First(order, orderId)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return order, nil
+}

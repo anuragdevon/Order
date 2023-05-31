@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"order/pkg/repository/models"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRepository(t *testing.T) {
@@ -30,5 +32,26 @@ func TestRepository(t *testing.T) {
 		if err != nil {
 			t.Errorf("Failed to delete order: %v", err)
 		}
+	})
+
+	t.Run("GetOrder to successfully retrieve an existing order from the database", func(t *testing.T) {
+		order := &models.Order{
+			ItemId:   456,
+			UserId:   789,
+			Quantity: 3,
+		}
+		db.CreateOrder(order)
+
+		retrievedOrder, err := db.GetOrder(order.Id)
+		assert.Nil(t, err)
+		assert.NotNil(t, retrievedOrder)
+		assert.Equal(t, order.ItemId, retrievedOrder.ItemId)
+	})
+
+	t.Run("GetOrder to return nil when order does not exist", func(t *testing.T) {
+		nonExistentOrderID := int64(999999)
+		retrievedOrder, err := db.GetOrder(nonExistentOrderID)
+		assert.NotNil(t, err)
+		assert.Nil(t, retrievedOrder)
 	})
 }

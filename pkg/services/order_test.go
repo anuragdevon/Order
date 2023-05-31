@@ -177,6 +177,7 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("GetOrder method to return status 200 OK and order data for a valid order ID", func(t *testing.T) {
+		userId := int64(12)
 		ItemId := int64(123)
 		mockClient := &mocks.InventoryServiceClient{}
 		client := &client.InventoryServiceClient{
@@ -188,7 +189,7 @@ func TestCreateOrder(t *testing.T) {
 		}
 		newOrder := models.Order{
 			ItemId:   ItemId,
-			UserId:   12,
+			UserId:   userId,
 			Quantity: 2,
 		}
 		db.CreateOrder(&newOrder)
@@ -205,7 +206,8 @@ func TestCreateOrder(t *testing.T) {
 		}, nil)
 
 		request := &pb.GetOrderRequest{
-			Id: newOrder.Id,
+			Id:     newOrder.Id,
+			UserId: userId,
 		}
 
 		response, err := orderService.GetOrder(context.Background(), request)
@@ -222,6 +224,7 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("GetOrder method to return 404 NotFound when requested user does not match with order userId", func(t *testing.T) {
+		userId := int64(12)
 		ItemId := int64(123)
 		mockClient := &mocks.InventoryServiceClient{}
 		client := &client.InventoryServiceClient{
@@ -233,7 +236,7 @@ func TestCreateOrder(t *testing.T) {
 		}
 		newOrder := models.Order{
 			ItemId:   ItemId,
-			UserId:   12,
+			UserId:   userId,
 			Quantity: 2,
 		}
 		db.CreateOrder(&newOrder)
@@ -250,7 +253,8 @@ func TestCreateOrder(t *testing.T) {
 		}, nil)
 
 		request := &pb.GetOrderRequest{
-			Id: newOrder.Id,
+			Id:     newOrder.Id,
+			UserId: 13,
 		}
 
 		response, err := orderService.GetOrder(context.Background(), request)
@@ -272,7 +276,8 @@ func TestCreateOrder(t *testing.T) {
 		}
 
 		request := &pb.GetOrderRequest{
-			Id: 999,
+			Id:     999,
+			UserId: 12,
 		}
 
 		response, err := orderService.GetOrder(context.Background(), request)
@@ -285,6 +290,7 @@ func TestCreateOrder(t *testing.T) {
 
 	t.Run("GetOrder method to return 502 BadGateway when GetItem returns an error", func(t *testing.T) {
 		itemId := int64(44)
+		userId := int64(12)
 		mockClient := &mocks.InventoryServiceClient{}
 		client := &client.InventoryServiceClient{
 			Client: mockClient,
@@ -296,7 +302,7 @@ func TestCreateOrder(t *testing.T) {
 
 		newOrder := models.Order{
 			ItemId:   itemId,
-			UserId:   12,
+			UserId:   userId,
 			Quantity: 2,
 		}
 		db.CreateOrder(&newOrder)
@@ -304,7 +310,8 @@ func TestCreateOrder(t *testing.T) {
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(nil, errors.New("Inventory service error"))
 
 		request := &pb.GetOrderRequest{
-			Id: newOrder.Id,
+			Id:     newOrder.Id,
+			UserId: userId,
 		}
 
 		response, err := orderService.GetOrder(context.Background(), request)

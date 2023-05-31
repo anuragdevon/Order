@@ -27,6 +27,8 @@ func NewOrderService(db *gorm.DB, inventorysvc *client.InventoryServiceClient) *
 }
 
 func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
+	db := repository.Database{DB: os.db}
+
 	itemResp, err := os.InventorySvc.GetItem(req.ItemId)
 
 	if err != nil {
@@ -54,7 +56,6 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 		UserId:   req.UserId,
 		Quantity: req.Quantity,
 	}
-	db := repository.Database{DB: os.db}
 
 	err = db.CreateOrder(&order)
 
@@ -78,7 +79,11 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 func (os *OrderService) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
 	db := repository.Database{DB: os.db}
 
-	order, _ := db.GetOrder(req.Id, req.UserId)
+	order, err := db.GetOrder(req.Id, req.UserId)
+
+	if err != nil {
+		return &pb.GetOrderResponse{Status: http.StatusInternalServerError, Error: err.Error()}, nil
+	}
 
 	if order == nil {
 		return &pb.GetOrderResponse{Status: http.StatusNotFound, Error: "Order not found"}, nil
@@ -98,6 +103,28 @@ func (os *OrderService) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (
 	}
 
 	return &pb.GetOrderResponse{
+		Status: http.StatusOK,
+		Data:   getOrderData,
+	}, nil
+}
+
+func (os *OrderService) GetAllOrder(ctx context.Context, req *pb.GetAllOrdersRequest) (*pb.GetAllOrdersResponse, error) {
+	db := repository.Database{DB: os.db}
+
+	orders, _ := db.GetOrdersByUserID(req.UserId)
+
+	var getOrderData []*pb.GetAllOrdersData
+	for _, order := range orders {
+		orderData := &pb.GetAllOrdersData{
+			Id:       order.Id,
+			ItemId:   order.ItemId,
+			Quantity: order.Quantity,
+		}
+
+		getOrderData = append(getOrderData, orderData)
+	}
+
+	return &pb.GetAllOrdersResponse{
 		Status: http.StatusOK,
 		Data:   getOrderData,
 	}, nil

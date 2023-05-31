@@ -314,4 +314,31 @@ func TestCreateOrder(t *testing.T) {
 		assert.Equal(t, int64(http.StatusBadGateway), response.Status, "Unexpected response status")
 		assert.Contains(t, response.Error, "Inventory service error", "Error message mismatch")
 	})
+
+	t.Run("GetAllOrder method to return status 200 OK and order data for a valid user ID", func(t *testing.T) {
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+
+		userID := int64(123)
+		allOrders := []models.Order{
+			{ItemId: 100, Quantity: 2, UserId: userID},
+			{ItemId: 200, Quantity: 3, UserId: userID},
+		}
+		for _, order := range allOrders {
+			db.CreateOrder(&order)
+		}
+
+		req := &pb.GetAllOrdersRequest{UserId: userID}
+		resp, err := orderService.GetAllOrder(context.Background(), req)
+
+		assert.NoError(t, err)
+		assert.Equal(t, 2, len(resp.Data))
+
+	})
 }

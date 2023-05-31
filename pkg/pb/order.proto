@@ -23,7 +23,7 @@ message CreateOrderResponse {
 
 message GetOrderData {
   int64 id = 1;
-  string itemId = 2;
+  int64 itemId = 2;
   string name = 3;
   int64 quantity = 4;
   double price = 5;

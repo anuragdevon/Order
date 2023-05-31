@@ -74,3 +74,31 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 		Id:     order.Id,
 	}, nil
 }
+
+func (os *OrderService) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
+	db := repository.Database{DB: os.db}
+
+	order, _ := db.GetOrder(req.Id)
+
+	if order == nil {
+		return &pb.GetOrderResponse{Status: http.StatusNotFound, Error: "Order not found"}, nil
+	}
+
+	itemResp, err := os.InventorySvc.GetItem(order.ItemId)
+	if err != nil {
+		return &pb.GetOrderResponse{Status: http.StatusBadGateway, Error: err.Error()}, nil
+	}
+
+	getOrderData := &pb.GetOrderData{
+		Id:       order.Id,
+		ItemId:   itemResp.Data.Id,
+		Name:     itemResp.Data.Name,
+		Quantity: order.Quantity,
+		Price:    itemResp.Data.Price,
+	}
+
+	return &pb.GetOrderResponse{
+		Status: http.StatusOK,
+		Data:   getOrderData,
+	}, nil
+}

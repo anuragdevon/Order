@@ -21,7 +21,7 @@ func Run() {
 	}
 
 	db := &repository.Database{}
-	err = db.Connect(c.DBUrl)
+	err = db.Connect(&c)
 	if err != nil {
 		log.Panic("failed to connect to database:", err)
 	}

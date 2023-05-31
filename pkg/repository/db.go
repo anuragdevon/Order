@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"order/pkg/config"
 	"order/pkg/repository/models"
 
 	"gorm.io/driver/postgres"
@@ -14,8 +15,8 @@ type Database struct {
 	DB *gorm.DB
 }
 
-func (p *Database) Connect(dbName string) error {
-	dsn := fmt.Sprintf("host=localhost port=5432 user=postgres password=postgres dbname=%s sslmode=disable", dbName)
+func (p *Database) Connect(c *config.Config) error {
+	dsn := fmt.Sprintf("host=localhost port=5432 user=%s password=%s dbname=%s sslmode=disable", c.DbUser, c.DbPassword, c.DbName)
 	var err error
 	p.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -42,6 +43,12 @@ func (p *Database) Close() error {
 	if err != nil {
 		log.Println("failed to get underlying SQL DB: %w", err)
 		return err
+	}
+	err = p.DB.Migrator().DropTable(
+		&models.Order{},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to drop tables: %w", err)
 	}
 
 	err = sqlDB.Close()

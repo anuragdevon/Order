@@ -342,7 +342,7 @@ func TestCreateOrder(t *testing.T) {
 		}
 
 		req := &pb.GetAllOrdersRequest{UserId: userID}
-		resp, err := orderService.GetAllOrder(context.Background(), req)
+		resp, err := orderService.GetAllOrders(context.Background(), req)
 
 		assert.NoError(t, err)
 		assert.Equal(t, 2, len(resp.Data))

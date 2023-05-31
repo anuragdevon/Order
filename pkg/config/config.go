@@ -12,7 +12,7 @@ type Config struct {
 }
 
 func LoadConfig() (config Config, err error) {
-	viper.AddConfigPath("/home/anurag/docs/swiggy/order/pkg/config/envs")
+	viper.AddConfigPath("/Users/anurag.kar_ftc/Documents/docs/food-order-system/backend/order/pkg/config/envs")
 	viper.SetConfigName("dev")
 	viper.SetConfigType("env")
 

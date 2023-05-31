@@ -104,7 +104,7 @@ func (os *OrderService) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (
 	}, nil
 }
 
-func (os *OrderService) GetAllOrder(ctx context.Context, req *pb.GetAllOrdersRequest) (*pb.GetAllOrdersResponse, error) {
+func (os *OrderService) GetAllOrders(ctx context.Context, req *pb.GetAllOrdersRequest) (*pb.GetAllOrdersResponse, error) {
 	db := repository.Database{DB: os.db}
 
 	orders, _ := db.GetOrdersByUserID(req.UserId)

@@ -78,7 +78,7 @@ func (os *OrderService) CreateOrder(ctx context.Context, req *pb.CreateOrderRequ
 func (os *OrderService) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*pb.GetOrderResponse, error) {
 	db := repository.Database{DB: os.db}
 
-	order, _ := db.GetOrder(req.Id)
+	order, _ := db.GetOrder(req.Id, req.UserId)
 
 	if order == nil {
 		return &pb.GetOrderResponse{Status: http.StatusNotFound, Error: "Order not found"}, nil

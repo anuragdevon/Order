@@ -15,16 +15,16 @@ import (
 )
 
 func TestCreateOrder(t *testing.T) {
-	mockClient := &mocks.InventoryServiceClient{}
-	client := &client.InventoryServiceClient{
-		Client: mockClient,
-	}
-	orderService := &OrderService{
-		InventorySvc: *client,
-		db:           db.DB,
-	}
-
 	t.Run("CreateOrder method to return 201 StatusCreated for successful valid order creation", func(t *testing.T) {
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+	
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
 			Status: http.StatusOK,
 			Error:  "",
@@ -51,6 +51,15 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("CreateOrder method to return 502 StatusBadGateway when GetItem returns an error", func(t *testing.T) {
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+	
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(nil, errors.New("GetItem error"))
 
 		request := &pb.CreateOrderRequest{
@@ -68,6 +77,15 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("CreateOrder method to return status 404 NotFound when the requested item is not found in the inventory", func(t *testing.T) {
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
 			Status: http.StatusNotFound,
 			Error:  "Item not found",
@@ -89,6 +107,15 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("CreateOrder method to return 409 StatusConflict when quantity is insufficient", func(t *testing.T) {
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+	
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
 			Status: http.StatusOK,
 			Error:  "",
@@ -113,6 +140,15 @@ func TestCreateOrder(t *testing.T) {
 	})
 
 	t.Run("CreateOrder method to return 500 InternalServerError when DecreaseItemQuantity Service call fails", func(t *testing.T) {
+		mockClient := &mocks.InventoryServiceClient{}
+		client := &client.InventoryServiceClient{
+			Client: mockClient,
+		}
+		orderService := &OrderService{
+			InventorySvc: *client,
+			db:           db.DB,
+		}
+	
 		mockClient.On("GetItem", mock.Anything, mock.Anything).Return(&pb.GetItemResponse{
 			Status: http.StatusOK,
 			Error:  "",
@@ -135,7 +171,7 @@ func TestCreateOrder(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, response, "Response is nil")
 		assert.Equal(t, int64(http.StatusInternalServerError), response.Status, "Unexpected response status")
-		assert.Contains(t, response.Error, "DecreaseItemQuantity error", "Error message mismatch")
+		assert.Contains(t, response.Error, "Internal server error", "Error message mismatch")
 
 	})
 

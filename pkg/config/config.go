@@ -4,7 +4,7 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	Port            string `mapstructure:"PORT"`
-	DbHost           string `mapstructure:"DB_HOST"`
+	DbHost          string `mapstructure:"DB_HOST"`
 	InventorySvcUrl string `mapstructure:"INVENTORY_SVC_URL"`
 	DbUser          string `mapstructure:"DB_USER"`
 	DbPassword      string `mapstructure:"DB_PASSWORD"`
@@ -12,7 +12,7 @@ type Config struct {
 }
 
 func LoadConfig() (config Config, err error) {
-	viper.AddConfigPath("/order_svc/pkg/config/envs")
+	viper.AddConfigPath("/order/pkg/config/envs")
 	viper.SetConfigName("dev")
 	viper.SetConfigType("env")
 

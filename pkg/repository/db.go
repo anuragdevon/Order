@@ -16,7 +16,7 @@ type Database struct {
 }
 
 func (p *Database) Connect(c *config.Config) error {
-	dsn := fmt.Sprintf("host=host.docker.internal port=5432 user=%s password=%s dbname=%s sslmode=disable", c.DbUser, c.DbPassword, c.DbName)
+	dsn := fmt.Sprintf("host=%s port=5432 user=%s password=%s dbname=%s sslmode=disable", c.DbHost, c.DbUser, c.DbPassword, c.DbName)
 	var err error
 	p.DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
